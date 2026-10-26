@@ -1,0 +1,31 @@
+{
+  "source_commit": "6b0391f276559811d5836153a44fa177b9feb9e2",
+  "sha256": {
+    ".openai/hosting.json": "562413597e76db2f4592005b99d1716368b9214efa355f4012736d37333ca604",
+    "dist/app.js": "33e6313d5ad0a7bc1abfb00a05720bcba52b474fa3357c8ffa37778d5c4177e1",
+    "dist/assets/bar.webp": "8c200d768885fb5b07ff22a9c7240e850af0c2d43e0d8dc94327abb412b6c818",
+    "dist/assets/exterior.webp": "5e0a1bb7bf33ba2bd092444db1e246fe1e055709a29596710aecd5ff41a120d8",
+    "dist/assets/garden.webp": "d62c98b79eb4411c1e538af62238fa668d3f7c61a63499fc03c43e40258eb42b",
+    "dist/assets/hotel-delacruxe-logo.png": "13b851fb8aa8eec8a2c3413c2007992ab472710aac59dfeca39326b3b1ced56b",
+    "dist/assets/hotel-logo.jpg": "f604ed25ef2371b291cf02a4789fdd875cc924acf060e539ed3f19d718ea628f",
+    "dist/assets/logo-transparent.png": "2b08ac0f6dc86c8cf9856dda9e46c2a427e4633064f94a6684071e7ead129246",
+    "dist/assets/lounge.webp": "78a52e534d500cb7dc555043cdf202bff86c0dc144628acbca4e3548f8caf627",
+    "dist/assets/room0.webp": "88619539f60783346f5afbb75d39c0de3b50709e821d4c7e6ad38dc9c3ad4737",
+    "dist/assets/room1.webp": "60f1bdf2ace53568f1a20b2444126b0172827bf851752d130f6571d3bb7a530f",
+    "dist/assets/room2.webp": "ab2498b9515e3c5d51fa1c7dbe962bc1be41e8df8c181b025e9ddc389caf5542",
+    "dist/assets/stairway.webp": "48534316ce4093330a2819892fe3e2095f6f9076ac833ee66bda295f9bb51a05",
+    "dist/experience.css": "8dbe782a7e67e978b8bc9488d840dc7184abc921f04af406aec94a8ca26e4969",
+    "dist/experience.js": "1593824601b282c785d1c37d212bfd28a79442c292a3ff113e4c422198c346b9",
+    "dist/index.html": "652233f18886c06962ae0aeab2dd6dfe6605d700826142f803690d9339a4ac2b",
+    "dist/motion.css": "6e3dcbcb7ec073104dd48ec3be655808f79b9f1ab9505d60c7aa519283124918",
+    "dist/motion.js": "946f78e2f1206a00c1720ab63e96f33d7935175339c6a5dd4d09ed65fc95b4b4",
+    "dist/refinements.css": "ed4a2d56358bf20212c4e622b04b95ca768d7bf4607a6e7ea45c15140f03316c",
+    "dist/refinements.js": "3fc9374b5e20477e17d1fc2b0eed36ed9b711569ba6714799b27075b65cff57b",
+    "dist/style.css": "c4c2af7ba438fc6ff948f4e2e7d3612acd3aed28bfce2127c620ec12210d8a78",
+    "dist/typography.css": "d3051d98ea26bd38c965b242d7069d1aefd70233cf11cb0c7e1a34343a981964",
+    "dist/typography.js": "8cd234067fafe40ce6f7d375ef7ba6ed4a424bf8ec4affa22665d8e1025edf4a",
+    "qa/check-integrity.py": "f4dbbcbffc212982b35a9921d53520fe7a61042bd554e4830982ab44dddc7dbf",
+    "qa/typography-audit.md": "d5b45a52dfc963c3b8a9c1004f670802f47e99ed8a61ca6340c219fae2e02afa",
+    "qa/typography-regression.html": "4b4373a84432f554f6eeb20c0a6fdf54691e3c9f8175614e675fa44f6f661e14"
+  }
+}

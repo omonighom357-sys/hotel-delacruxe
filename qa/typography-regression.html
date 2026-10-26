@@ -1,0 +1,44 @@
+<!doctype html><meta charset="utf-8"><title>Typography regression QA</title><style>body{font:14px Arial;background:#eee}button{padding:12px;margin:5px}iframe{display:block;border:0;height:844px;position:fixed;left:8px;top:90px}pre{white-space:pre-wrap}</style><button id="run">Run regression suite</button><button id="extra">Check motion lifecycle</button><button id="phone">Show phone</button><button id="tablet">Show tablet</button><pre id="result">Ready</pre><div id="frames"></div><script>
+const frames=document.getElementById("frames"), results=[], errors=[];const assert=(name,pass,details)=>results.push({name,pass,details});const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function frame(width,baseline=false,mode='normal'){
+const f=document.createElement('iframe');f.style.width=width+'px';frames.append(f);
+const path=baseline?'/_qa-baseline/':'/';let html=await(await fetch(path)).text();
+const inject=`<base href="${path}"><script>window.__qaErrors=[];addEventListener('error',e=>__qaErrors.push(e.message));addEventListener('unhandledrejection',e=>__qaErrors.push(String(e.reason)));window.__played=[];const originalAnimate=Element.prototype.animate;Element.prototype.animate=function(k,o){__played.push({tag:this.tagName,id:this.id,cls:this.className,frames:k,options:o});return originalAnimate.call(this,k,o)};${mode==='reduced'?`const originalMatch=window.matchMedia;window.matchMedia=q=>q.includes('prefers-reduced-motion')?{matches:true,addEventListener(){},removeEventListener(){}}:originalMatch(q);`:''}<\/script>`;
+html=html.replace('<head>','<head>'+inject);if(mode==='nojs')f.setAttribute('sandbox','allow-same-origin');
+f.srcdoc=html;await new Promise(r=>f.onload=r);await wait(100);const d=f.contentDocument;f.dataset.hadArrival=String(!!d.querySelector('.arrival'));d.querySelector('.skip-arrival')?.click();await wait(1500);return f;
+}
+function geometry(d){return [...d.querySelectorAll('main>section,h1,h2,h3')].map(e=>({text:e.matches('section')?e.id||e.className:e.textContent,width:e.offsetWidth,height:e.offsetHeight,top:e.matches('section')?e.offsetTop:0}))}
+function input(d,id,value){const e=d.getElementById(id);e.value=value;e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}))}
+run.onclick=async()=>{try{run.disabled=true;results.length=0;frames.replaceChildren();sessionStorage.setItem('delacruxe-arrived','yes');
+for(const width of [320,390,768,1024,1440]){
+ result.textContent='Checking '+width+'px…';const a=await frame(width,true),b=await frame(width);const d=b.contentDocument,w=b.contentWindow;
+ const ga=geometry(a.contentDocument),gb=geometry(d);assert(width+'px layout unchanged',JSON.stringify(ga)===JSON.stringify(gb),ga.filter((x,i)=>JSON.stringify(x)!==JSON.stringify(gb[i])).map((x,i)=>({before:x,after:gb[ga.indexOf(x)]})));
+ assert(width+'px no horizontal overflow',d.documentElement.scrollWidth<=w.innerWidth,{scroll:d.documentElement.scrollWidth,viewport:w.innerWidth});
+ for(const s of d.querySelectorAll('main>section')){s.scrollIntoView({behavior:'instant'});await wait(80)}await wait(3400);
+ const unsettled=[...d.querySelectorAll('h1,h2')].filter(e=>!e.closest('dialog')&&(getComputedStyle(e).opacity!=='1'||e.classList.contains('is-sweeping'))).map(e=>({text:e.textContent,opacity:getComputedStyle(e).opacity}));assert(width+'px text settled',unsettled.length===0,unsettled);
+ assert(width+'px no runtime errors',w.__qaErrors.length===0,w.__qaErrors);
+ const y=w.scrollY;d.querySelector('[data-room]').click();assert(width+'px booking opens without scrolling',d.querySelector('#reservation').open&&w.scrollY===y);
+ d.querySelector('.reservation-close').click();assert(width+'px booking closes',!d.querySelector('#reservation').open);a.remove();b.remove();
+}
+const b=await frame(390),d=b.contentDocument,w=b.contentWindow;let captured='';w.open=url=>{captured=url;return null};
+d.querySelectorAll('.explore-room')[1].click();d.querySelector('[data-detail="bathroom"]').click();assert('Room detail tabs',d.querySelector('#room-detail').textContent.includes('bathroom'));d.querySelector('#explore-book').click();assert('Explorer books selected room',d.querySelector('#overlay-preference').selectedIndex===2);
+for(const [id,val] of Object.entries({'guest-name':'QA Guest','checkin':'2026-11-10','checkout':'2026-11-12','arrival':'14:30','guests':'3 guests','room-count':'2','requests':'Quiet room please'}))input(d,'overlay-'+id,val);
+d.querySelector('#overlay-form').requestSubmit();const msg=decodeURIComponent(captured);assert('WhatsApp payload correct',msg.startsWith('https://wa.me/2349163351767?text=')&&['QA Guest','2026-11-10','2026-11-12','14:30','3 guests','Midnight calm','Quiet room please'].every(x=>msg.includes(x)));
+d.querySelector('.reservation-close').click();assert('Booking form retains selections',d.querySelector('#guest-name').value==='QA Guest');captured='';d.querySelector('#booking-form').requestSubmit();assert('Lower form WhatsApp payload',decodeURIComponent(captured).includes('QA Guest'));
+d.querySelector('[data-photo]').click();assert('Gallery opens',d.querySelector('#lightbox').open);d.querySelector('#close-lightbox').click();
+d.querySelector('.menu').click();assert('Mobile menu opens',d.querySelector('nav').classList.contains('open'));d.querySelector('nav a').click();assert('Menu link closes navigation',!d.querySelector('nav').classList.contains('open'));
+d.querySelector('[data-stay="romantic"]').click();assert('Stay chooser updates',d.querySelector('#stay-headline').textContent.includes('just for two'));
+d.querySelector('#mood').click();assert('Atmosphere toggle',d.body.classList.contains('morning'));
+d.querySelector('.concierge-launch').click();d.querySelector('[data-topic="Location"]').click();assert('Concierge responds',d.querySelector('#concierge-answer').textContent.includes('Ugboroke'));d.querySelector('#close-concierge').click();
+d.querySelector('#discovery-button').click();assert('Discovery note',!d.querySelector('#discovery-note').hidden);
+d.querySelector('#motion-toggle').click();await wait(50);assert('Motion off settles new text effects',!d.querySelector('.is-sweeping')&&!d.getAnimations().some(a=>a.effect?.target?.matches('h2,.title-mask>span')));b.remove();
+const r=await frame(390,false,'reduced');assert('Reduced-motion JS branch starts no typography effects',!r.contentWindow.__played.some(x=>x.frames.some(k=>'filter' in k||'backgroundPosition' in k)));r.remove();
+const n=await frame(390,false,'nojs');assert('No-JavaScript main content readable',[...n.contentDocument.querySelectorAll('main h1,main h2')].every(e=>getComputedStyle(e).opacity==='1'));n.remove();
+const hero=await frame(390);assert('Hero rise timing',hero.contentWindow.__played.some(x=>x.options.duration===1080&&x.frames[0].transform==='translateY(44px)'));hero.remove();
+}catch(e){assert('Suite exception',false,String(e))}finally{run.disabled=false;result.textContent=JSON.stringify(results,null,2)}};
+extra.onclick=async()=>{frames.replaceChildren();results.length=0;sessionStorage.removeItem('delacruxe-arrived');const f=await frame(390),d=f.contentDocument,w=f.contentWindow;assert('Fresh intro appears and skips',f.dataset.hadArrival==='true'&&!d.querySelector('.arrival'));assert('Hero follows skipped intro',w.__played.some(x=>x.options.duration===1080));
+d.querySelector('.experience-copy h2').scrollIntoView({behavior:'instant'});await wait(3600);const played=w.__played;assert('Curtain activated',played.some(x=>x.frames.some(k=>'clipPath' in k)&&x.options.duration===1120));assert('Golden sweep activated',played.some(x=>x.options.duration===2100));assert('Bloom activated',played.some(x=>x.options.duration===920));assert('Golden phrase restored',!d.querySelector('.is-sweeping'));
+const count=played.filter(x=>x.options.duration===2100).length;d.querySelector('#home').scrollIntoView({behavior:'instant'});await wait(100);d.querySelector('.experience-copy h2').scrollIntoView({behavior:'instant'});await wait(400);assert('Golden sweep does not replay',played.filter(x=>x.options.duration===2100).length===count);
+f.style.width='768px';await wait(200);assert('Resize has no overflow',d.documentElement.scrollWidth<=w.innerWidth);assert('Resize leaves headings readable',[...d.querySelectorAll('main h2')].every(e=>getComputedStyle(e).opacity==='1'));w.DelaCruxeTypography.destroy();assert('Cleanup leaves text visible',!d.querySelector('.is-sweeping'));result.textContent=JSON.stringify(results,null,2);f.remove()};
+phone.onclick=async()=>{frames.replaceChildren();await frame(390)};tablet.onclick=async()=>{frames.replaceChildren();await frame(768)};
+</script>
