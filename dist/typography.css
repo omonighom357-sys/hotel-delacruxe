@@ -1,0 +1,18 @@
+/* Typography is visible by default. Only finite WAAPI effects conceal it. */
+.hero .title-mask>span{transform:none;transition:none}
+/* Keep the established line box and its descender allowance unchanged. */
+.js .reveal.typography-parent{opacity:1;transform:none;transition:none}
+.typography-gold{--sweep-base:#dfc39d;background-repeat:no-repeat}
+.experience-copy .typography-gold{--sweep-base:#c4ad88}
+.slow-copy .typography-gold{--sweep-base:#e0c49a}
+.typography-gold.is-sweeping{
+  color:transparent;
+  background-image:linear-gradient(105deg,var(--sweep-base) 0%,var(--sweep-base) 38%,#ead8b6 46%,#f4e5ca 50%,#ead8b6 54%,var(--sweep-base) 62%,var(--sweep-base) 100%);
+  background-size:250% 100%;background-position:100% 0;
+  -webkit-background-clip:text;background-clip:text;
+}
+@media(prefers-reduced-motion:reduce){
+  .typography-gold.is-sweeping{color:var(--sweep-base);background:none}
+}
+.motion-paused .typography-gold.is-sweeping{color:var(--sweep-base);background:none}
+@media print{.typography-gold.is-sweeping{color:inherit;background:none}.title-mask{overflow:visible}}
